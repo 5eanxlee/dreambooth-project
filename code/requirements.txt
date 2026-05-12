@@ -1,0 +1,15 @@
+numpy
+hydra-core
+torch
+diffusers
+transformers
+accelerate
+safetensors
+Pillow
+torchvision
+ftfy
+scipy
+tqdm
+huggingface_hub
+matplotlib
+bitsandbytes; platform_system != "Windows"

@@ -1,0 +1,38 @@
+defaults:
+  - subject: backpack
+  - mode: full
+  - _self_
+
+# Public reproduction path: image DreamBooth / LoRA on Stable Diffusion v1.5.
+# Switch mode=lora on the CLI to train LoRA adapters instead of the full UNet.
+task: image
+
+model:
+  # image options: stabilityai/stable-diffusion-xl-base-1.0 | runwayml/stable-diffusion-v1-5 | common-canvas/CommonCanvas-XL-C
+  # video option : ali-vilab/text-to-video-ms-1.7b
+  pretrained_model: runwayml/stable-diffusion-v1-5
+
+data:
+  instance_prompt: ${subject.instance_prompt}
+  resolution: 512
+  instance_data_dir: ${subject.instance_data_dir}
+  class_images_npz: ${subject.class_images_npz}
+  class_prompt: ${subject.class_prompt}
+
+training:
+  # max_train_steps and learning_rate are supplied by the mode group:
+  #   mode=full -> 1000 steps at 5e-6   (DreamBooth paper defaults for SD1.5)
+  #   mode=lora -> 1500 steps at 1e-4
+  prior_loss_weight: 1.0
+  train_batch_size: 1
+  gradient_accumulation_steps: 1
+  log_every_steps: 25
+  seed: 0
+
+lora:
+  rank: 16
+  alpha: 4.0
+
+hydra:
+  job:
+    chdir: false

@@ -4,10 +4,11 @@ Reimplementation of DreamBooth subject-driven generation with Stable Diffusion, 
 
 This repository re-implements **DreamBooth** (Ruiz et al., CVPR 2023) on
 Stable Diffusion v1.5, evaluates it with the paper's three fidelity metrics
-(DINO, CLIP-I, CLIP-T), and attempts three extensions: a **LoRA** variant
+(DINO, CLIP-I, CLIP-T), and attempts four extensions: a **LoRA** variant
 of the fine-tuning, an adaptation of the DreamBooth formulation to a
-**text-to-video** model (ModelScopeT2V), and a **classifier-guidance**
-attempt at weight-free personalization.
+**text-to-video** model (ModelScopeT2V), a **classifier-guidance** attempt
+at weight-free personalization, and **DINO semantic guidance** during
+sampling.
 
 ## 1. Introduction
 
@@ -25,7 +26,8 @@ regularizing effect similar to the prior-preservation loss; (2) adapting
 the formulation to **ModelScopeT2V**, a text-to-video latent diffusion
 model, to see whether DreamBooth scales to much higher-dimensional latent
 spaces; and (3) **classifier guidance** as a weight-free alternative to
-fine-tuning, which we show naively fails.
+fine-tuning; and (4) **DINO semantic guidance**, which nudges samples toward
+subject-reference DINO features at inference time.
 
 **Paper:** Ruiz, N., Li, Y., Jampani, V., Pritch, Y., Rubinstein, M.,
 Aberman, K. *DreamBooth: Fine Tuning Text-to-Image Diffusion Models for
@@ -53,11 +55,12 @@ code/
   evaluate.py                DINO + CLIP-I + CLIP-T computation
   lora.py                    LoRALinear module + UNet attention patching
   anchor.py                  Classifier-guidance experiments (4 target strategies)
+  semantic_guidance.py       DINO feature guidance during sampling
   class_priors.py            Class-prior .npz loader used by the training dataset
   generate_class_images.py   Auto-generate class prior images for new classes
   generate_class_priors.py   Pack class images into the .npz format
   run_pipeline.py            End-to-end orchestrator (train -> gen -> eval)
-  run_guidance_pipeline.py   Sweep wrapper for the classifier-guidance experiments
+  run_guidance_pipeline.py   Sweep wrapper for anchor and DINO-guidance experiments
   aggregate_results.py       Walk results/, emit a single all_metrics.csv
   plot_metrics.py            Bar charts, Pareto scatter, per-subject, loss curves
   make_grid.py               Image-grid composer for poster figures
@@ -111,6 +114,13 @@ report/                      2-page report PDF
   generation, a fresh resample per step, and the nearest noised subject
   latent - and swept guidance weights and schedules over each.
   Implementation in `code/anchor.py`.
+- **DINO semantic guidance.** An inference-time feature guidance path that
+  decodes the predicted clean latent during sampling, compares its DINO
+  embedding against the mean embedding of the subject reference images, and
+  applies a gradient update to the current latent. We evaluated raw and
+  RMS-normalized updates, windowed schedules, update-norm clamps, and
+  combinations with anchor guidance. Implementation in
+  `code/semantic_guidance.py`.
 
 ### Configs
 

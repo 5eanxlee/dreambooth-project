@@ -1,13 +1,13 @@
-# Reproducing DreamBooth: Subject-Driven Generation with Diffusion Models
+# dreambooth-project
 
-By Sean Lee, Andrew Noviello, Eashan Vagish, Ronald Leung
+Reimplementation of DreamBooth subject-driven generation with Stable Diffusion, LoRA fine-tuning, evaluation metrics, and guidance-based personalization experiments.
 
 This repository re-implements **DreamBooth** (Ruiz et al., CVPR 2023) on
 Stable Diffusion v1.5, evaluates it with the paper's three fidelity metrics
 (DINO, CLIP-I, CLIP-T), and attempts three extensions: a **LoRA** variant
 of the fine-tuning, an adaptation of the DreamBooth formulation to a
 **text-to-video** model (ModelScopeT2V), and a **classifier-guidance**
-attempt at weight-free personalization (which we show fails).
+attempt at weight-free personalization.
 
 ## 1. Introduction
 
@@ -73,8 +73,8 @@ data/
   README.md                  How to obtain reference and class images
   class_images/              Auto-generated; gitignored
 results/                     Trained models, generated images, metrics, figures
-poster/                      Poster workspace
-report/                      Report workspace
+poster/                      Final poster PDF
+report/                      2-page report PDF
 ```
 
 ## 4. Re-implementation Details
@@ -129,12 +129,16 @@ but are slow.
 
 ```bash
 git clone <this-repo-url>
-cd DreamBooth
-git clone https://github.com/google/dreambooth.git           # subject images
+cd dreambooth-project
 pip install -r code/requirements.txt
 ```
 
 ### One-shot reproduction
+
+**Note:** Every stage in `run_pipeline.py` (train / generate / evaluate) skips cells whose
+outputs already exist, so re-running is idempotent and safe. If you need to
+regenerate something, delete the corresponding marker file (`run_stats.json`
+for train, `metadata.json` for generate, `metrics.json` for evaluate) and re-run.
 
 ```bash
 # Generate 200 class-prior images per class (~20 min)
@@ -169,7 +173,7 @@ python code/generate.py subject=dog model.model_path=results/dog_lora
 
 # Evaluate generated images
 python code/evaluate.py \
-  --real_images_dir dreambooth/dataset/dog \
+  --real_images_dir data/instance_images/dog \
   --generated_images_dir results/dog_lora_results \
   --prompts_file results/dog_lora_results/metadata.json \
   --output_file results/dog_lora_results/metrics.json
@@ -254,7 +258,4 @@ ModelScope text-to-video technical report. *arXiv preprint* arXiv:2308.06571.
 ## 9. Acknowledgements
 
 The DreamBooth dataset is provided by the original paper's authors at
-<https://github.com/google/dreambooth>. Stable Diffusion v1.5 weights are
-distributed by Runway via Hugging Face. ModelScopeT2V weights are
-distributed by Alibaba DAMO Academy via Hugging Face. Implementation
-builds on the `diffusers` library by Hugging Face.
+<https://github.com/google/dreambooth>.

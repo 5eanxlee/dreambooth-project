@@ -269,3 +269,5 @@ ModelScope text-to-video technical report. *arXiv preprint* arXiv:2308.06571.
 
 The DreamBooth dataset is provided by the original paper's authors at
 <https://github.com/google/dreambooth>.
+
+By Sean Lee, Andrew Noviello, Eashan Vagish, Ronald Leung.

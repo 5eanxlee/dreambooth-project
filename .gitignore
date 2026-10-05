@@ -78,3 +78,7 @@ paper.pdf
 
 # Cloned / vendored reference repos
 dreambooth/
+
+# Removed project assets
+/poster-template.png
+/report/
